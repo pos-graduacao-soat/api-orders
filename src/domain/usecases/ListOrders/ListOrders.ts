@@ -29,7 +29,7 @@ export class ListOrdersUseCase implements IListOrdersUseCase {
     return sortedOrders
   }
 
-  private sortOrders(orders: Order[]): Order[] {  
+  private sortOrders(orders: Order[]): Order[] {
     return orders.sort((a, b) => {
       const order = {
         [Status.WAITINGPAYMENT]: 1,
@@ -40,9 +40,9 @@ export class ListOrdersUseCase implements IListOrdersUseCase {
         [Status.RECEIVED]: 6,
         [Status.DONE]: 7,
       }
-      
+
       return order[a.status] - order[b.status]
     })
-  
+
   }
 }

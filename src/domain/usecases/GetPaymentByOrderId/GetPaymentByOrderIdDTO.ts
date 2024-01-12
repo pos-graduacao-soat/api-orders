@@ -1,3 +1,3 @@
 export interface GetPaymentByOrderIdDTO {
-    orderId: string
+  orderId: string
 }

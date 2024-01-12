@@ -1,6 +1,6 @@
-import { Payment } from "../../entities/Payment";
-import { GetPaymentByOrderIdDTO } from "./GetPaymentByOrderIdDTO";
+import { Payment } from '../../entities/Payment'
+import { GetPaymentByOrderIdDTO } from './GetPaymentByOrderIdDTO'
 
 export interface IGetPaymentByOrderIdUseCase {
-    get: (params: GetPaymentByOrderIdDTO) => Promise<Payment>
+  get: (params: GetPaymentByOrderIdDTO) => Promise<Payment>
 }
