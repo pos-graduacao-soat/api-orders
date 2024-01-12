@@ -5,5 +5,4 @@ export interface CreateOrderDTO {
     price: number
   }[]
   customerId?: string
-  totalPrice: number
 }

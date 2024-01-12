@@ -12,9 +12,9 @@ export class CreateOrderController implements IController {
     readonly createOrderUseCase: ICreateOrderUseCase,
   ) { }
   async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    const { customerId, totalPrice, products } = httpRequest.body
+    const { customerId, products } = httpRequest.body
 
-    const result = await this.createOrderUseCase.create({ customerId, totalPrice, products })
+    const result = await this.createOrderUseCase.create({ customerId, products })
 
     return ok(result, 'Order created')
   }
