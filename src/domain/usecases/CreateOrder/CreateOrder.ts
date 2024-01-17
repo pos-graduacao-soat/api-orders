@@ -50,28 +50,11 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
 
     if (!isCreated) throw new Error('Order not created')
 
-    await this.createPayment(order.id)
-
     const createdOrder = await this.orderRepository.getById(order.id)
 
     if (!createdOrder) throw new Error('Order not created')
 
     return createdOrder
-  }
-
-  private async createPayment(orderId: string) {
-    const payment = new Payment.Payment({
-      orderId: orderId,
-      status: Payment.Status.RECEIVED
-    })
-
-    const isCreated = await this.paymentRepository.create(payment)
-
-    if (!isCreated) {
-      await this.orderRepository.updateStatus(orderId, Status.PAYMENTPROBLEM)
-
-      throw new Error('Payment not created')
-    }
   }
 
   private validateProductsParams(products: CreateOrderDTO['products']) {
