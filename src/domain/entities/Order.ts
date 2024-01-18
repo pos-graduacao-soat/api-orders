@@ -1,6 +1,6 @@
-import { Customer } from './Customer'
 import { Entity } from './Entity'
-import { Product } from './Product'
+import { Product } from '../valueObjects/Product'
+import { Customer } from '../valueObjects/Customer'
 
 export class OrderProduct extends Product {
   public constructor(props: Partial<OrderProduct>) {

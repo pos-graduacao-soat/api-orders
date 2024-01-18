@@ -5,12 +5,11 @@ import { IOrderRepository } from '../../ports/repositories/Order'
 import { CreateOrderDTO } from './CreateOrderDTO'
 import { ICreateOrderUseCase } from './ICreateOrder'
 import { Order, OrderProduct, Status } from '../../entities/Order'
-import { Customer } from '../../entities/Customer'
 import { NotFoundError } from '../../errors/NotFoundError'
-import * as Payment from '../../entities/Payment'
-import { IPaymentRepository } from '../../ports/repositories/Payment'
 import { IProductRepository } from '../../ports/repositories/Product'
 import { ICustomerRepository } from '../../ports/repositories/Customer'
+import { Customer } from '../../valueObjects/Customer'
+import { Product } from '../../valueObjects/Product'
 
 @injectable()
 export class CreateOrderUseCase implements ICreateOrderUseCase {
@@ -21,28 +20,26 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     private readonly productRepository: IProductRepository,
     @inject('ICustomerRepository')
     private readonly customerRepository: ICustomerRepository,
-    @inject('IPaymentRepository')
-    private readonly paymentRepository: IPaymentRepository,
   ) { }
 
   async create(params: CreateOrderDTO): Promise<Order> {
     const { products, customerId } = params
 
-    const calculatedTotalPrice = products.reduce((acc, product) => acc + product.price * product.quantity, 0)
-
-    this.validateProductsParams(products)
-
-    await this.validateProductExist(products)
-
     if (customerId)
       await this.validateCustomerExist(customerId)
 
-    const parsedProducts = products.map(product => new OrderProduct({ id: product.id, price: product.price, quantity: product.quantity }))
+    this.validateProductsParams(products)
+
+    const completeProducts = await this.getProducts(products)
+
+    const orderProducts = products.map(product => this.createOrderProduct(product.id, product.quantity, completeProducts))
+
+    const totalValue = orderProducts.reduce((sum, orderProduct) => sum + (orderProduct.price * orderProduct.quantity), 0)
 
     const order = new Order({
       customer: customerId ? new Customer({ id: customerId }) : undefined,
-      products: parsedProducts,
-      totalPrice: calculatedTotalPrice,
+      products: orderProducts,
+      totalPrice: totalValue,
       status: Status.WAITINGPAYMENT
     })
 
@@ -53,6 +50,8 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     const createdOrder = await this.orderRepository.getById(order.id)
 
     if (!createdOrder) throw new Error('Order not created')
+
+    createdOrder.products = orderProducts
 
     return createdOrder
   }
@@ -65,17 +64,37 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     if (!productsAreValid) throw new InvalidParamError('Invalid param: products')
   }
 
-  private async validateProductExist(products: CreateOrderDTO['products']) {
+  private async getProducts(products: CreateOrderDTO['products']): Promise<Product[]> {
     const productIds = products.map(product => product.id)
 
     const foundProducts = await this.productRepository.getByIds(productIds)
 
     if (products.length !== foundProducts.length) throw new NotFoundError('Products not found')
+
+    return foundProducts
   }
 
   private async validateCustomerExist(customerId: string) {
     const foundCustomer = await this.customerRepository.getById(customerId)
 
     if (!foundCustomer) throw new NotFoundError('Customer not found')
+  }
+
+  private createOrderProduct(productId: string, quantity: number, completeProducts: Product[]) {
+    const product = completeProducts.find(product => product.id === productId)
+
+    if (!product) {
+      throw new Error(`Product with id ${productId} not found`)
+    }
+
+    return new OrderProduct({
+      id: productId,
+      quantity,
+      category: product.category,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      image: product.image,
+    })
   }
 }

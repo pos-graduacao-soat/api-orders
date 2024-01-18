@@ -1,9 +1,9 @@
 import { inject, injectable } from 'tsyringe'
-import { Customer } from '../../entities/Customer'
 import { Order, Status } from '../../entities/Order'
 import { IOrderRepository } from '../../ports/repositories/Order'
 import { IListOrdersUseCase } from './IListOrders'
 import { ListOrdersDTO } from './ListOrdersDTO'
+import { Customer } from '../../valueObjects/Customer'
 
 @injectable()
 export class ListOrdersUseCase implements IListOrdersUseCase {

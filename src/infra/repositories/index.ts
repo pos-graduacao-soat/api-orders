@@ -1,4 +1,3 @@
-export * from './Customer'
-export * from './Order'
-export * from './Product'
-export * from './Payment'
+export * from './http/Customer'
+export * from './sql/Order'
+export * from './http/Product'

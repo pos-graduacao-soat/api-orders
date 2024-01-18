@@ -1,6 +1,6 @@
-import { Entity } from './Entity'
+import { ValueObject } from './valueObject'
 
-export class Payment extends Entity<Payment> {
+export class Payment extends ValueObject<Payment> {
   public constructor(props: Partial<Payment>) {
     super(props)
   }

@@ -1,17 +1,15 @@
 import { Knex } from 'knex'
 import { inject, injectable } from 'tsyringe'
 import { v4 } from 'uuid'
-import { Customer } from '../../domain/entities/Customer'
-import { Order, OrderProduct, Status } from '../../domain/entities/Order'
-import { Category } from '../../domain/entities/Product'
-import { IOrderRepository } from '../../domain/ports/repositories/Order'
+import { IOrderRepository } from '../../../domain/ports/repositories/Order'
+import { Order, OrderProduct, Status } from '../../../domain/entities/Order'
+import { Customer } from '../../../domain/valueObjects/Customer'
 
 @injectable()
-export class OrderRepository implements IOrderRepository {
+export class MySqlOrderRepository implements IOrderRepository {
   constructor(
     @inject('MySqlDatabase') protected readonly database: Knex
   ) { }
-
 
   async create(order: Order): Promise<boolean> {
     const { customer, products, totalPrice } = order
@@ -46,20 +44,11 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async getById(orderId: string): Promise<Order | null> {
-    let customer = null
-
     const order = await this.database('orders').where('orders.id', orderId).first()
 
     if (!order) return null
 
-    if (order.customer_id) {
-      customer = await this.database('customers').where('customers.id', order.customer_id).first()
-    }
-
-    const products = await this.database('order_products')
-      .where('order_products.order_id', orderId)
-      .join('products', 'products.id', '=', 'order_products.product_id')
-      .select('products.*', 'order_products.quantity')
+    const orderProducts = await this.database('order_products').where('order_products.order_id', orderId)
 
     return new Order({
       id: order.id,
@@ -67,24 +56,10 @@ export class OrderRepository implements IOrderRepository {
       totalPrice: order.total_price,
       createdAt: order.created_at,
       updatedAt: order.updated_at,
-      customer: customer ? new Customer({
-        id: customer.id,
-        name: customer.name,
-        email: customer.email,
-        documentNumber: customer.document_number,
-        createdAt: customer.created_at,
-        updatedAt: customer.updated_at
-      }) : undefined,
-      products: products.map(product => {
+      products: orderProducts.map(product => {
         return new OrderProduct({
           id: product.id,
-          name: product.name,
-          category: product.category as Category,
-          price: product.price,
-          description: product.description,
           quantity: product.quantity,
-          createdAt: product.created_at,
-          updatedAt: product.updated_at
         })
       })
     })
