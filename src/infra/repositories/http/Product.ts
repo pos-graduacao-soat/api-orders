@@ -57,6 +57,8 @@ export class HttpProductRepository implements IProductRepository {
 
     const { data } = productsResponse
 
+    if (productsResponse.status !== 200) return []
+
     return data.data.map(productData => new Product({
       id: productData.id,
       name: productData.name,

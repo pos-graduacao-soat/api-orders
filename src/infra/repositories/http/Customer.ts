@@ -27,7 +27,7 @@ export class HttpCustomerRepository implements ICustomerRepository {
 
     const { data } = customer
 
-    if (!customer) return null
+    if (customer.status !== 200) return null
 
     return new Customer({
       documentNumber: data.data.documentNumber,
