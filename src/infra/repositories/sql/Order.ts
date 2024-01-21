@@ -28,7 +28,9 @@ export class MySqlOrderRepository implements IOrderRepository {
         id: v4(),
         product_id: product.id,
         order_id: order.id,
-        quantity: product.quantity
+        quantity: product.quantity,
+        name: product.name,
+        price: product.price,
       }))
 
       await trx('order_products').insert(orderProducts)
@@ -60,6 +62,8 @@ export class MySqlOrderRepository implements IOrderRepository {
         return new OrderProduct({
           id: product.id,
           quantity: product.quantity,
+          name: product.name,
+          price: product.price,
         })
       })
     })
@@ -72,16 +76,38 @@ export class MySqlOrderRepository implements IOrderRepository {
   }
 
   async list(filters: Partial<Order>): Promise<Order[]> {
-    const orders = await this.database('orders').where(this.buildFilters(filters)).orderBy('created_at', 'desc')
+    const rows = await this.database('orders')
+      .where(this.buildFilters(filters))
+      .join('order_products', 'orders.id', '=', 'order_products.order_id')
+      .orderBy('orders.created_at', 'desc')
+      .select('orders.*', 'order_products.*')
 
-    return orders.map(order => new Order({
-      id: order.id,
-      status: order.status,
-      totalPrice: order.total_price,
-      createdAt: order.created_at,
-      updatedAt: order.updated_at,
-      customer: order.customer_id ? new Customer({ id: order.customer_id }) : undefined
-    }))
+    const ordersMap: { [id: string]: Order } = {}
+
+    for (const row of rows) {
+      if (!ordersMap[row.order_id]) {
+        ordersMap[row.order_id] = new Order({
+          id: row.order_id,
+          status: row.status,
+          totalPrice: row.total_price,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+          customer: row.customer_id ? new Customer({ id: row.customer_id }) : undefined,
+          products: []
+        })
+      }
+
+      const orderProduct = new OrderProduct({
+        id: row.id,
+        quantity: row.quantity,
+        name: row.name,
+        price: row.price,
+      })
+
+      ordersMap[row.order_id].products.push(orderProduct)
+    }
+
+    return Object.values(ordersMap)
   }
 
   private buildFilters(filters: Partial<Order>) {
