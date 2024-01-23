@@ -1,6 +1,6 @@
 import { knex, Knex } from 'knex'
 
-import knexconfig from '../../../knexfile.js'
+import knexconfig from '../../../knexfile'
 
 export class KnexConnection {
   private knexInstance: Knex
