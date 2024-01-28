@@ -1,10 +1,10 @@
-import { inject, injectable } from "tsyringe";
-import { IOrderRepository } from "../../ports/repositories/Order";
-import { Order, Status, } from "../../entities/Order";
-import { NotFoundError } from "../../errors/NotFoundError";
-import { IUpdateOrderStatusUseCase } from "./IUpdateOrderStatus";
-import { UpdateOrderStatusDTO } from "./UpdateOrderStatusDTO";
-import { InvalidParamError } from "../../errors/InvalidParam";
+import { inject, injectable } from 'tsyringe'
+import { IOrderRepository } from '../../ports/repositories/Order'
+import { Order, Status, } from '../../entities/Order'
+import { NotFoundError } from '../../errors/NotFoundError'
+import { IUpdateOrderStatusUseCase } from './IUpdateOrderStatus'
+import { UpdateOrderStatusDTO } from './UpdateOrderStatusDTO'
+import { InvalidParamError } from '../../errors/InvalidParam'
 
 @injectable()
 export class UpdateOrderStatusUseCase implements IUpdateOrderStatusUseCase {
@@ -24,10 +24,10 @@ export class UpdateOrderStatusUseCase implements IUpdateOrderStatusUseCase {
 
     if (!isUpdated) throw new NotFoundError('Order not found')
 
-    const order = await this.orderRepository.getById(orderId);
+    const order = await this.orderRepository.getById(orderId)
 
     if (!order) throw new NotFoundError('Order not found')
 
-    return order;
+    return order
   }
 }

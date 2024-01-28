@@ -4,14 +4,16 @@ import { KnexConnection } from '../infra/database/knex'
 import { HttpCustomerRepository, HttpProductRepository, MySqlOrderRepository } from '../infra/repositories'
 import { HttpService } from '../infra/http/HttpService'
 
-container.registerInstance('MySqlDatabase', new KnexConnection().getConnection())
-container.registerInstance('HttpService', new HttpService({ validateStatus: () => true }))
+export function initializeContainer() {
+  container.registerInstance('MySqlDatabase', new KnexConnection().getConnection())
+  container.registerInstance('HttpService', new HttpService({ validateStatus: () => true }))
 
-container.registerSingleton('ICustomerRepository', HttpCustomerRepository)
-container.registerSingleton('IProductRepository', HttpProductRepository)
-container.registerSingleton('IOrderRepository', MySqlOrderRepository)
+  container.registerSingleton('ICustomerRepository', HttpCustomerRepository)
+  container.registerSingleton('IProductRepository', HttpProductRepository)
+  container.registerSingleton('IOrderRepository', MySqlOrderRepository)
 
-container.register<ICreateOrderUseCase>('ICreateOrderUseCase', CreateOrderUseCase)
-container.register<IGetOrderByIdUseCase>('IGetOrderByIdUseCase', GetOrderByIdUseCase)
-container.register<IListOrdersUseCase>('IListOrdersUseCase', ListOrdersUseCase)
-container.register<IUpdateOrderStatusUseCase>('IUpdateOrderStatusUseCase', UpdateOrderStatusUseCase)
+  container.register<ICreateOrderUseCase>('ICreateOrderUseCase', CreateOrderUseCase)
+  container.register<IGetOrderByIdUseCase>('IGetOrderByIdUseCase', GetOrderByIdUseCase)
+  container.register<IListOrdersUseCase>('IListOrdersUseCase', ListOrdersUseCase)
+  container.register<IUpdateOrderStatusUseCase>('IUpdateOrderStatusUseCase', UpdateOrderStatusUseCase)
+}

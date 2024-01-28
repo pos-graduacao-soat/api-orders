@@ -39,6 +39,7 @@ export class MySqlOrderRepository implements IOrderRepository {
 
       return true
     } catch (error) {
+      console.log(error)
       await trx.rollback()
 
       return false
