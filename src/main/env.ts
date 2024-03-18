@@ -3,4 +3,5 @@ export const env = {
   customersApiUrl: process.env.CUSTOMERS_API_URL || '',
   paymentsApiUrl: process.env.PAYMENTS_API_URL || '',
   productsApiUrl: process.env.PRODUCTS_API_URL || '',
+  rabbitMQUrl: process.env.RABBITMQ_URL || ''
 }
