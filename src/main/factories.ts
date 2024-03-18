@@ -9,6 +9,7 @@ import { env } from './env'
 import { StartProductionOfOrderUseCase } from '../domain/usecases/StartProductionOfOrder/StartProductionOfOrder'
 import { IStartProductionOfOrderUseCase } from '../domain/usecases/StartProductionOfOrder/IStartProductionOfOrder'
 import { ProductionOrderProducer } from '../infra/amqp/producers/ProductionOrderProducer'
+import { OrderStatusUpdateConsumer } from '../infra/amqp/consumers/OrderStatusUpdateConsumer'
 
 export async function initializeContainer() {
   const rabbitMQService = new RabbitMQService(env.rabbitMQUrl)
@@ -24,6 +25,7 @@ export async function initializeContainer() {
   container.registerSingleton('IOrderRepository', MySqlOrderRepository)
 
   container.registerSingleton('PaymentStatusUpdateConsumer', PaymentStatusUpdateConsumer)
+  container.registerSingleton('OrderStatusUpdateConsumer', OrderStatusUpdateConsumer)
 
   container.registerSingleton('ProductionOrderProducer', ProductionOrderProducer)
 
@@ -36,5 +38,7 @@ export async function initializeContainer() {
 
 export async function startConsumers() {
   const paymentStatusUpdateConsumer = container.resolve<PaymentStatusUpdateConsumer>('PaymentStatusUpdateConsumer')
+  const orderStatusUpdateConsumer = container.resolve<OrderStatusUpdateConsumer>('OrderStatusUpdateConsumer')
   paymentStatusUpdateConsumer.consume().then(() => console.log('PaymentStatusUpdateConsumer Consumer started'))
+  orderStatusUpdateConsumer.consume().then(() => console.log('OrderStatusUpdateConsumer Consumer started'))
 }
