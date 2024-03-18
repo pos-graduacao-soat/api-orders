@@ -2,9 +2,9 @@ import { inject, injectable } from 'tsyringe'
 import RabbitMQService from '../RabbitMQService'
 
 @injectable()
-export class UpdateOrderPublisher {
-  exchange = 'orders'
-  routingKey = 'update-order'
+export class ProductionOrderProducer {
+  exchange = 'production-orders'
+  routingKey = 'start-production-order'
 
   constructor(
     @inject('RabbitMQService')

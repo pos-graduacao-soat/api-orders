@@ -6,6 +6,9 @@ import { HttpService } from '../infra/http/HttpService'
 import RabbitMQService from '../infra/amqp/RabbitMQService'
 import { PaymentStatusUpdateConsumer } from '../infra/amqp/consumers/PaymentStatusUpdateConsumer'
 import { env } from './env'
+import { StartProductionOfOrderUseCase } from '../domain/usecases/StartProductionOfOrder/StartProductionOfOrder'
+import { IStartProductionOfOrderUseCase } from '../domain/usecases/StartProductionOfOrder/IStartProductionOfOrder'
+import { ProductionOrderProducer } from '../infra/amqp/producers/ProductionOrderProducer'
 
 export async function initializeContainer() {
   const rabbitMQService = new RabbitMQService(env.rabbitMQUrl)
@@ -22,10 +25,13 @@ export async function initializeContainer() {
 
   container.registerSingleton('PaymentStatusUpdateConsumer', PaymentStatusUpdateConsumer)
 
+  container.registerSingleton('ProductionOrderProducer', ProductionOrderProducer)
+
   container.register<ICreateOrderUseCase>('ICreateOrderUseCase', CreateOrderUseCase)
   container.register<IGetOrderByIdUseCase>('IGetOrderByIdUseCase', GetOrderByIdUseCase)
   container.register<IListOrdersUseCase>('IListOrdersUseCase', ListOrdersUseCase)
   container.register<IUpdateOrderStatusUseCase>('IUpdateOrderStatusUseCase', UpdateOrderStatusUseCase)
+  container.register<IStartProductionOfOrderUseCase>('IStartProductionOfOrderUseCase', StartProductionOfOrderUseCase)
 }
 
 export async function startConsumers() {

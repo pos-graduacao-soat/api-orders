@@ -1,15 +1,16 @@
 import { inject, injectable } from 'tsyringe'
 import RabbitMQService from '../RabbitMQService'
-import { IUpdateOrderStatusUseCase } from '../../../domain/usecases'
+import { IStartProductionOfOrderUseCase } from '../../../domain/usecases/StartProductionOfOrder/IStartProductionOfOrder'
 
 @injectable()
 export class PaymentStatusUpdateConsumer {
   queue = 'update-order'
+
   constructor(
     @inject('RabbitMQService')
     private rabbitMQService: RabbitMQService,
-    @inject('IUpdateOrderStatusUseCase')
-    private UpdateOrderStatusUseCase: IUpdateOrderStatusUseCase
+    @inject('IStartProductionOfOrderUseCase')
+    private startProductionOfOrderUseCase: IStartProductionOfOrderUseCase
   ) { }
 
   async consume(): Promise<void> {
@@ -18,11 +19,15 @@ export class PaymentStatusUpdateConsumer {
         const paymentData = JSON.parse(message.content.toString())
 
         if (!paymentData.id || !paymentData.status) {
-          this.rabbitMQService.ack(message)
+          this.rabbitMQService.nack(message)
           return
         }
 
-        await this.UpdateOrderStatusUseCase.update({ orderId: paymentData.id, status: paymentData.status })
+        console.log(`[PaymentStatusUpdateConsumer] Consumed message with orderId: ${paymentData.id} and status: ${paymentData.status}`)
+
+        await this.startProductionOfOrderUseCase.execute({ orderId: paymentData.id, status: paymentData.status })
+
+        this.rabbitMQService.ack(message)
       }
     })
   }

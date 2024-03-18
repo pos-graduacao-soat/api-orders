@@ -35,6 +35,10 @@ class RabbitMQService {
   async ack(message: amqp.ConsumeMessage): Promise<void> {
     this.channel.ack(message)
   }
+
+  async nack(message: amqp.ConsumeMessage): Promise<void> {
+    this.channel.nack(message)
+  }
 }
 
 export default RabbitMQService
