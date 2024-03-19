@@ -15,15 +15,15 @@ services:
       - './docker/db/data:/var/lib/mysql'
       - './docker/db/my.cnf:/etc/mysql/conf.d/my.cnf'
       - './docker/db/sql:/docker-entrypoint-initdb.d'
-  api-orders:
+  server:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - .env
     environment:
-      DB_HOST: db
+      DB_HOST: api-orders-mysql
     ports:
-      - 3000:3000
+      - 3002:3002
     depends_on:
       - db
