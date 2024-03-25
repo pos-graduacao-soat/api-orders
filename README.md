@@ -6,9 +6,13 @@ This application requires Docker to work, turn on docker then run the following 
 $ docker-compose up -d
 ```
 
+# SAGA Pattern - Choreography
+
+We chose to use choreography to implement the SAGA pattern, as it is a more decentralized approach, where each service is responsible for its own transactions and the communication between services is done through events. This way, we can avoid a single point of failure and make the system more scalable. Since it's a fairly simple flow of order creation, we decided to use this approach.
+
 # Trying the app
 
-After containers are up, the api will be available at [http://localhost:3000](http://localhost:3000)
+After containers are up, the api will be available at [http://localhost:3002](http://localhost:3002)
 
 ## Locally without Docker
 If you'd like to run locally, offside the container, follow the next steps:
@@ -18,15 +22,15 @@ If you'd like to run locally, offside the container, follow the next steps:
 
 After containers are up, turn of the app container and run the following commands:
 
+### Install dependencies
+```bash
+$ npm install
+```
+
 ### Run migrations
 
 ```bash
 $ npm run update-migrations
-```
-
-### Install dependencies
-```bash
-$ npm install
 ```
 
 ### Run the app
@@ -36,13 +40,7 @@ $ npm install
 $ npm run dev
 ```
 
-## Running with kubernetes
-
-Make sure your docker is running and you have kubernetes installed. Then run:
-
-```bash
-$ npm run config-k8s
 ```
 ## DOCS
 
-After app starts running, go to [http://localhost:3000/doc](http://localhost:3000/doc) to check the swagger doc.
+After app starts running, go to [http://localhost:3002/doc](http://localhost:3002/doc) to check the swagger doc.
