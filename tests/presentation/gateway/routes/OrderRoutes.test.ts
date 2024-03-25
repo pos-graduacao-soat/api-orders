@@ -4,7 +4,7 @@ import { Server } from 'http'
 import fs from 'fs'
 
 import { startHttpServer } from '../../../../src/presentation/gateway/httpServer'
-import { initializeContainer } from '../../../../src/main/factories'
+import { initializeContainer, startConsumers } from '../../../../src/main/factories'
 import { Knex, knex } from 'knex'
 import config from '../../../../knexfile'
 import { container } from 'tsyringe'
@@ -26,6 +26,18 @@ jest.mock('../../../../src/infra/http/HttpService', () => {
   }
 })
 
+jest.mock('../../../../src/infra/amqp/RabbitMQService', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      connect: jest.fn(),
+      publish: jest.fn(),
+      ack: jest.fn(),
+      consume: jest.fn(),
+      disconnect: jest.fn(),
+      nack: jest.fn(),
+    }
+  })
+})
 
 jest.mock('../../../../knexfile', () => {
   const config: Knex.Config = {
@@ -72,7 +84,8 @@ describe('CustomerRoutes', () => {
     it('should return 404 if customerId exists in params but entity service returns 404', async () => {
       mockHttpService.get.mockResolvedValue({ status: 404, data: {} })
 
-      initializeContainer()
+      await initializeContainer()
+      await startConsumers()
       server = startHttpServer()
 
       const response = await request(server).post('/orders').send({ customerId: '123' })

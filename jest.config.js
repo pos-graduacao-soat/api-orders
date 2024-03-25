@@ -12,6 +12,8 @@ module.exports = {
     '<rootDir>/src/presentation/gateway/errors/',
     '<rootDir>/src/presentation/gateway/middlewares/',
     '<rootDir>/src/.*\\index\\.ts',
+    '<rootDir>/src/infra/amqp/consumers/',
+    '<rootDir>/src/infra/amqp/producers/',
   ],
   collectCoverageFrom: [
     '<rootDir>/src/**/*.ts',
@@ -20,6 +22,8 @@ module.exports = {
     '!<rootDir>/src/main/**',
     '!<rootDir>/src/presentation/gateway/errors/**',
     '!<rootDir>/src/presentation/gateway/middlewares/**',
+    '!<rootDir>/src/infra/amqp/consumers/**',
+    '!<rootDir>/src/infra/amqp/producers/**',
     '!<rootDir>/**/index.ts',
     '!<rootDir>/src/.*\\index\\.ts'
   ],
